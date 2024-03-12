@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Socket.IO Example</title>
+  </head>
+  <body>
+    <h1>Socket.IO Example</h1>
+    <div id="messages"></div>
+
+    <form id="message-form">
+      <input
+        type="text"
+        id="message-input"
+        placeholder="Digite sua mensagem..."
+      />
+      <button type="submit">Enviar</button>
+    </form>
+
+    <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
+    <script>
+      const socket = io('http://localhost:3000');
+
+      const author = Math.random().toString(36).substr(2, 9).toString();
+
+      socket.on('connect', () => {
+        console.log('Conexão estabelecida.');
+      });
+
+      socket.on('chat', (message) => {
+        const messages = document.getElementById('messages');
+
+        messages.innerHTML += `<p><strong>${message.author}:</strong> ${message.content}</p>`;
+      });
+
+      socket.on('disconnect', () => {
+        console.log('Desconectado do servidor.');
+      });
+
+      document
+        .getElementById('message-form')
+        .addEventListener('submit', (event) => {
+          event.preventDefault();
+
+          const messageInput = document.getElementById('message-input');
+          const message = messageInput.value;
+
+          socket.emit('chat', { author, content: message });
+          messageInput.value = '';
+        });
+    </script>
+  </body>
+</html>
